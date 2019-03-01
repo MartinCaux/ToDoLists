@@ -14,11 +14,16 @@ class Item: Codable {
     var description: String
     var imageURLs: [String] = []
     var categories: [Category] = []
-    
-    init(name: String, description: String = "") {
+    var checked: Bool
+
+    init(name: String, description: String = "", checked: Bool = false) {
         self.name = name
         self.description = description
+        self.checked = checked
     }
-    
-    
+
+    func toggleChecked() {
+        self.checked = !self.checked
+    }
+
 }

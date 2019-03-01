@@ -12,9 +12,15 @@ import UIKit
 class Category: Codable {
     var name: String
     var imageURL: String?
-    
-    init(name: String, imageURL: String? = "") {
+    var checked: Bool
+
+    init(name: String, imageURL: String? = "", checked: Bool = false) {
         self.name = name
         self.imageURL = imageURL
+        self.checked = checked
+    }
+
+    func toggleChecked() {
+        self.checked = !self.checked
     }
 }
