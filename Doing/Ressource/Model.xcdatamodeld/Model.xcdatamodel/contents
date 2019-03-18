@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18D109" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Category" representedClassName="Category" syncable="YES" codeGenerationType="class">
+        <attribute name="accessCode" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
+        <attribute name="accessCode" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="createDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="editDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="picture" optional="YES" attributeType="UUID" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" syncable="YES"/>
+    </entity>
+    <entity name="List" representedClassName="List" syncable="YES" codeGenerationType="class">
+        <attribute name="accessCode" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="items" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Item" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Category" positionX="399.10546875" positionY="113.46875" width="128" height="75"/>
+        <element name="List" positionX="-126.79296875" positionY="35.234375" width="128" height="88"/>
+        <element name="Item" positionX="133.62109375" positionY="140.06640625" width="128" height="133"/>
+    </elements>
+</model>
