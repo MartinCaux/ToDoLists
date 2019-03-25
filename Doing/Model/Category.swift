@@ -12,15 +12,24 @@ import UIKit
 class Category: Codable {
     var name: String
     var imageURL: String?
-    var checked: Bool
+    var selected: Bool
+    var items: [Item]
 
-    init(name: String, imageURL: String? = "", checked: Bool = false) {
+    init(name: String, imageURL: String? = "", selected: Bool = false, items: [Item] = []) {
         self.name = name
         self.imageURL = imageURL
-        self.checked = checked
+        self.selected = selected
+        self.items = items
     }
 
-    func toggleChecked() {
-        self.checked = !self.checked
+    func toggleSelected() {
+        self.selected = !self.selected
+    }
+}
+
+extension Category: NSCopying {
+    func copy(with zone: NSZone? = nil) -> Any {
+        let category = Category(name: self.name, imageURL: self.imageURL, selected: self.selected, items: self.items)
+        return category
     }
 }

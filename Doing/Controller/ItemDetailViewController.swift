@@ -12,10 +12,16 @@ class ItemDetailViewController: UITableViewController {
 
     @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet weak var itemName: UITextField!
+    @IBOutlet weak var itemDescription: UITextField!
+    @IBOutlet weak var itemCreationTime: UILabel!
+    @IBOutlet weak var itemModificationTime: UILabel!
+    @IBOutlet weak var itemImage: UIImageView!
+    @IBOutlet weak var categoryLabel: UILabel!
     
     var delegate: ItemDetailViewControllerDelegate?
     
     var itemToEdit: Item?
+    var selectedCategory: Category?
     
     override func viewDidLoad() {
         itemName.becomeFirstResponder()
@@ -23,6 +29,15 @@ class ItemDetailViewController: UITableViewController {
         if(itemToEdit != nil) {
             navigationController?.title = "Edit Item"
             itemName.text = itemToEdit!.name
+            itemDescription.text = itemToEdit!.description
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMM dd, yyyy 'at' hh:mm a"
+            itemCreationTime.text = dateFormatter.string(from: itemToEdit!.creationTime)
+            if(itemToEdit!.modificationTime != nil) {
+                itemModificationTime.text = dateFormatter.string(from: itemToEdit!.modificationTime!)
+            }
+            selectedCategory = itemToEdit!.category
+            categoryLabel.text = selectedCategory?.name
         } else {
             navigationController?.title = "Add Item"            
         }
@@ -30,18 +45,42 @@ class ItemDetailViewController: UITableViewController {
 
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if(segue.identifier == "pickCategory") {
+            let navVC = segue.destination as! UINavigationController
+            let destVC = navVC.topViewController as! CategoryPickerController
+            destVC.delegate = self
+        }
+    }
+    
+    
     @IBAction func done(_ sender: Any) {
         if(itemToEdit != nil) {
             itemToEdit!.name = itemName.text!
+            itemToEdit!.description = itemDescription.text!
+            itemToEdit!.modificationTime = Date()
+            itemToEdit!.category = selectedCategory!
             delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!)
         } else {
-            delegate!.listDetailViewController(self, didFinishAddingItem: Item(name: itemName.text!))
+            delegate!.listDetailViewController(self, didFinishAddingItem: Item(name: itemName.text!, description: itemDescription.text!, category: selectedCategory!))
         }
     }
     
     @IBAction func cancel(_ sender: Any) {
         delegate!.listDetailViewControllerDidCancel(self)
     }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(indexPath.section == 1) {
+            itemName.resignFirstResponder()
+            tableView.deselectRow(at: indexPath, animated: true)
+            //performSegue(withIdentifier: "pickCategory", sender: tableView.cellForRow(at: indexPath))
+        } else {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
+    
     
 }
 
@@ -64,5 +103,14 @@ extension ItemDetailViewController:UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         return !(textField.text?.isEmpty)!
+    }
+}
+
+extension ItemDetailViewController:CategoryPickerControllerDelegate {
+    func categoryPickerViewController(_ controller: CategoryPickerController, didFinishPickingCategory category: Category) {
+        selectedCategory = category
+        categoryLabel.text = selectedCategory!.name
+        tableView.reloadRows(at: [NSIndexPath(row: 0, section: 1) as IndexPath], with: .none)
+        controller.dismiss(animated: false, completion: nil)
     }
 }
