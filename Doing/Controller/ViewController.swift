@@ -86,6 +86,10 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
         if dataModel.selectedCategoryList.count > 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier")!
             cell.textLabel?.text = dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].name
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMM dd, yyyy 'at' hh:mm a"
+            cell.detailTextLabel?.text = dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].modificationTime != nil ? "updated on \(dateFormatter.string(from: dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].modificationTime!))" :
+                "created on \(dateFormatter.string(from: dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].creationTime))"
             cell.accessoryType = dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].checked ? .checkmark : .none
             return cell
         } else {
