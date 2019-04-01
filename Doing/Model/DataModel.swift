@@ -12,17 +12,12 @@ import NotificationCenter
 class DataModel {
     static let sharedInstance = DataModel()
 
-//    var itemList: [Item] = []
-//    var filteredItemList: [Item] = []
     var categoryList: [Category] = []
     var selectedCategoryList: [Category] = []
     var allCategoriesSelected: Bool = true
 
     var documentDirectory: URL {
         return FileManager.default.urls(for: FileManager.SearchPathDirectory.documentDirectory, in: FileManager.SearchPathDomainMask.allDomainsMask)[0]
-    }
-    var itemListFileUrl: URL {
-        return documentDirectory.appendingPathComponent("itemList").appendingPathExtension("json")
     }
     var categoryListFileUrl: URL {
         return documentDirectory.appendingPathComponent("categoryList").appendingPathExtension("json")
@@ -31,7 +26,7 @@ class DataModel {
     init() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(saveLists),
+            selector: #selector(saveCategorylist),
             name: UIApplication.didEnterBackgroundNotification,
             object: nil)
     }
@@ -45,32 +40,6 @@ class DataModel {
         }
     }
 
-
-
-//    @objc func saveChecklists() {
-//        let encoder = JSONEncoder()
-//        encoder.outputFormatting = .prettyPrinted
-//        do {
-//            let data = try encoder.encode(self.itemList)
-//            try data.write(to: self.itemListFileUrl, options: Data.WritingOptions.atomic)
-//        } catch {
-//            print(error)
-//        }
-//    }
-//
-//    func loadChecklists() {
-//        if(FileManager.default.fileExists(atPath: (itemListFileUrl.path))) {
-//            do {
-//                let data = try Data(contentsOf: self.itemListFileUrl)
-//                let decoder = JSONDecoder()
-//                self.itemList = try decoder.decode([Item].self, from: data)
-//                self.filteredItemList = itemList
-//            } catch {
-//                print(error)
-//            }
-//        }
-//        filter()
-//    }
     
     func isAnyCategorySelected() -> Bool {
         for category: Category in categoryList {
@@ -124,6 +93,13 @@ class DataModel {
     }
     
     
+    func initAllFilteredItemList() {
+        for category: Category in categoryList {
+            category.initFilteredItems()
+        }
+    }
+    
+    
     
     @objc func saveCategorylist() {
         let encoder = JSONEncoder()
@@ -133,18 +109,6 @@ class DataModel {
             try data.write(to: self.categoryListFileUrl, options: Data.WritingOptions.atomic)
         } catch {
             print(error)
-        }
-    }
-    
-    @objc func saveLists() {
-//        saveChecklists()
-        saveCategorylist()
-    }
-
-    
-    func initAllFilteredItemList() {
-        for category: Category in categoryList {
-            category.initFilteredItems()
         }
     }
     

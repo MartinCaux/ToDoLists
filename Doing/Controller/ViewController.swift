@@ -132,12 +132,9 @@ extension ViewController:ItemDetailViewControllerDelegate {
 
     func listDetailViewController(_ controller: ItemDetailViewController, didFinishAddingItem item: Item, forCategory category: Category) {
         controller.dismiss(animated: true)
-        category.filteredItems.append(item)
         category.items.append(item)
-//        dataModel.itemList.append(item)
+        category.filteredItems.append(item)
         dataModel.sortCheckLists()
-//        let indexOfNewItem = dataModel.itemList.index(where: {$0 === item})
-        //        self.tableView.insertRows(at: [NSIndexPath(row: indexOfNewItem!, section: 0) as IndexPath], with: UITableView.RowAnimation.automatic)
         dataModel.filter()
         tableView.reloadData()
     }
@@ -153,14 +150,16 @@ extension ViewController:ItemDetailViewControllerDelegate {
     func listDetailViewController(_ controller: ItemDetailViewController, didFinishEditingItem item: Item, fromCategory oldCategory: Category, toCategory newCategory: Category) {
         controller.dismiss(animated: true)
         
-        var indexOfItemToRemove = oldCategory.filteredItems.index(where: {$0 === item})
+        var indexOfItemToRemove = oldCategory.items.index(where: {$0 === item})
+        oldCategory.items.remove(at: indexOfItemToRemove!)
+
+        indexOfItemToRemove = oldCategory.filteredItems.index(where: {$0 === item})
         oldCategory.filteredItems.remove(at: indexOfItemToRemove!)
         
-        indexOfItemToRemove = oldCategory.items.index(where: {$0 === item})
-        oldCategory.items.remove(at: indexOfItemToRemove!)
         
         newCategory.items.append(item)
         newCategory.filteredItems.append(item)
+        
         dataModel.sortCheckLists()
         dataModel.filter()
         tableView.reloadData()

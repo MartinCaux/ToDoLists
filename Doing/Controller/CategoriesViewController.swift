@@ -144,8 +144,8 @@ class CategoriesViewController: UITableViewController {
     }
     
     func deleteRow(indexPath: IndexPath) {
-        let categoryToDelete = dataModel.categoryList[indexPath.row]
-        if categoryToDelete.items.count > 0 {
+        let categoryToDelete = tempCategoryList[indexPath.row]
+        if categoryToDelete.items.count == 0 {
             self.tempCategoryList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .none)
             if self.toggleAll() {
@@ -165,7 +165,7 @@ class CategoriesViewController: UITableViewController {
             }
             message += "."
             
-            let alertDialog = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            let alertDialog = UIAlertController(title: "Impossible !", message: message, preferredStyle: .alert)
             
             alertDialog.addAction(UIAlertAction(title: "Ok", style: .default))
             
