@@ -242,11 +242,26 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="149.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Xp-C7-XVr">
-                                                    <rect key="frame" x="143" y="11" width="128" height="128"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Image Selected" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nHt-US-WKR">
+                                                    <rect key="frame" x="142" y="66" width="130" height="18"/>
+                                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
+                                                    <color key="textColor" red="0.97647720579999997" green="0.9764588475" blue="0.97647124529999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="3Xp-C7-XVr">
+                                                    <rect key="frame" x="119" y="10" width="176" height="128"/>
+                                                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </imageView>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="3Xp-C7-XVr" secondAttribute="bottom" constant="11.5" id="6CI-eT-DMI"/>
+                                                <constraint firstItem="3Xp-C7-XVr" firstAttribute="leading" secondItem="Mee-4S-Pq4" secondAttribute="leading" constant="119" id="GUI-BY-JH1"/>
+                                                <constraint firstItem="3Xp-C7-XVr" firstAttribute="top" secondItem="Mee-4S-Pq4" secondAttribute="top" constant="10" id="RUd-C4-ao1"/>
+                                                <constraint firstItem="nHt-US-WKR" firstAttribute="centerY" secondItem="Mee-4S-Pq4" secondAttribute="centerY" id="W83-HB-Anz"/>
+                                                <constraint firstAttribute="trailing" secondItem="3Xp-C7-XVr" secondAttribute="trailing" constant="119" id="iZT-ht-qSS"/>
+                                                <constraint firstItem="3Xp-C7-XVr" firstAttribute="centerX" secondItem="Mee-4S-Pq4" secondAttribute="centerX" id="kyE-hv-B2d"/>
+                                                <constraint firstItem="nHt-US-WKR" firstAttribute="centerX" secondItem="Mee-4S-Pq4" secondAttribute="centerX" id="z8C-J5-ztr"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -324,11 +339,13 @@
                     <connections>
                         <outlet property="categoryLabel" destination="sU9-Yb-fD6" id="VaZ-zB-TxS"/>
                         <outlet property="doneButton" destination="FY6-Gr-lH6" id="Poe-bs-0xc"/>
+                        <outlet property="imagePickerCell" destination="uPh-hN-SKy" id="rDm-q9-Qao"/>
                         <outlet property="itemCreationTime" destination="bNC-YG-HbK" id="i3t-xP-RY4"/>
                         <outlet property="itemDescription" destination="Ed6-UI-x8s" id="3Os-cJ-SHU"/>
                         <outlet property="itemImage" destination="3Xp-C7-XVr" id="Cfh-03-nTu"/>
                         <outlet property="itemModificationTime" destination="o5w-g9-uiB" id="UJo-XQ-VEy"/>
                         <outlet property="itemName" destination="iO2-q7-KzP" id="Cwt-MZ-wH0"/>
+                        <outlet property="noImageSelectedLabel" destination="nHt-US-WKR" id="ALj-FV-EMO"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fDZ-Z2-4TR" userLabel="First Responder" sceneMemberID="firstResponder"/>

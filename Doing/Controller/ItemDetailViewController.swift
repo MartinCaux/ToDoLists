@@ -17,6 +17,8 @@ class ItemDetailViewController: UITableViewController {
     @IBOutlet weak var itemModificationTime: UILabel!
     @IBOutlet weak var itemImage: UIImageView!
     @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var noImageSelectedLabel: UILabel!
+    @IBOutlet weak var imagePickerCell: UITableViewCell!
     
     var delegate: ItemDetailViewControllerDelegate?
     
@@ -26,6 +28,13 @@ class ItemDetailViewController: UITableViewController {
     
     override func viewDidLoad() {
         itemName.becomeFirstResponder()
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
+        itemImage.isUserInteractionEnabled = true
+        itemImage.addGestureRecognizer(tapGestureRecognizer)
+        imagePickerCell.bringSubviewToFront(noImageSelectedLabel);
+        imagePickerCell.sendSubviewToBack(itemImage)
+        noImageSelectedLabel.layer.zPosition = 1;
+        
         doneButton.isEnabled = false
         if(itemToEdit != nil) {
             navigationController?.title = "Edit Item"
@@ -42,6 +51,9 @@ class ItemDetailViewController: UITableViewController {
         } else {
             navigationController?.title = "Add Item"
             categoryLabel.text = "No Category Selected"
+        }
+        if(itemImage.image != nil) {
+            noImageSelectedLabel.isHidden = true
         }
         super.viewDidLoad()
 
@@ -87,6 +99,19 @@ class ItemDetailViewController: UITableViewController {
         }
     }
     
+    
+    @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer)
+    {
+//        let tappedImage = tapGestureRecognizer.view as! UIImageView
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
+        
+        present(imagePicker, animated: true, completion: nil)
+        // Your action
+    }
     
 }
 
@@ -136,5 +161,16 @@ extension ItemDetailViewController:CategoryPickerControllerDelegate {
         }
         tableView.reloadRows(at: [NSIndexPath(row: 0, section: 1) as IndexPath], with: .none)
         controller.dismiss(animated: false, completion: nil)
+    }
+}
+
+extension ItemDetailViewController:UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            itemImage.contentMode = .scaleToFill
+            noImageSelectedLabel.isHidden = true
+            itemImage.image = image
+        }
+        picker.dismiss(animated: true, completion: nil)
     }
 }
