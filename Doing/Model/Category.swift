@@ -14,22 +14,28 @@ class Category: Codable {
     var imageURL: String?
     var selected: Bool
     var items: [Item]
+    var filteredItems: [Item]
 
-    init(name: String, imageURL: String? = "", selected: Bool = false, items: [Item] = []) {
+    init(name: String, imageURL: String? = "", selected: Bool = false, items: [Item] = [], filteredItems: [Item] = []) {
         self.name = name
         self.imageURL = imageURL
         self.selected = selected
         self.items = items
+        self.filteredItems = filteredItems
     }
 
     func toggleSelected() {
         self.selected = !self.selected
     }
+    
+    func initFilteredItems() {
+        self.filteredItems = items
+    }
 }
 
 extension Category: NSCopying {
     func copy(with zone: NSZone? = nil) -> Any {
-        let category = Category(name: self.name, imageURL: self.imageURL, selected: self.selected, items: self.items)
+        let category = Category(name: self.name, imageURL: self.imageURL, selected: self.selected, items: self.items, filteredItems: self.filteredItems)
         return category
     }
 }

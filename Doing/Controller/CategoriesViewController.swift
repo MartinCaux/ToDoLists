@@ -144,8 +144,8 @@ class CategoriesViewController: UITableViewController {
     }
     
     func deleteRow(indexPath: IndexPath) {
-        let itemForCategory = itemList(itemList: dataModel.itemList, contains: tempCategoryList[indexPath.row])
-        if itemForCategory.count == 0 {
+        let categoryToDelete = dataModel.categoryList[indexPath.row]
+        if categoryToDelete.items.count > 0 {
             self.tempCategoryList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .none)
             if self.toggleAll() {
@@ -154,11 +154,11 @@ class CategoriesViewController: UITableViewController {
         } else {
             var message = "This category is used in : \n"
             var counter = 0
-            for item: Item in itemForCategory {
+            for item: Item in categoryToDelete.items {
                 counter += 1
-                if counter < 3 && counter < itemForCategory.count {
+                if counter < 3 && counter < categoryToDelete.items.count {
                     message += "\(item.name), "
-                } else if counter == 3 || counter == itemForCategory.count {
+                } else if counter == 3 || counter == categoryToDelete.items.count {
                     message += "\(item.name)"
                     break
                 }
@@ -174,15 +174,15 @@ class CategoriesViewController: UITableViewController {
         }
     }
     
-    func itemList(itemList: [Item], contains category: Category ) -> [Item] {
-        var itemForCategory = [Item]()
-        for item: Item in itemList {
-            if item.category.name == category.name {
-                itemForCategory.append(item)
-            }
-        }
-        return itemForCategory
-    }
+//    func itemList(itemList: [Item], contains category: Category ) -> [Item] {
+//        var itemForCategory = [Item]()
+//        for item: Item in itemList {
+//            if item.category.name == category.name {
+//                itemForCategory.append(item)
+//            }
+//        }
+//        return itemForCategory
+//    }
     
     func deselectAllRows() {
         for index in 0 ... tempCategoryList.count - 1 {

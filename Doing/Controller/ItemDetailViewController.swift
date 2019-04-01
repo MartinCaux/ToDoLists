@@ -21,6 +21,7 @@ class ItemDetailViewController: UITableViewController {
     var delegate: ItemDetailViewControllerDelegate?
     
     var itemToEdit: Item?
+    var itemToEditCategory: Category?
     var selectedCategory: Category?
     
     override func viewDidLoad() {
@@ -36,10 +37,11 @@ class ItemDetailViewController: UITableViewController {
             if(itemToEdit!.modificationTime != nil) {
                 itemModificationTime.text = dateFormatter.string(from: itemToEdit!.modificationTime!)
             }
-            selectedCategory = itemToEdit!.category
+            selectedCategory = itemToEditCategory!
             categoryLabel.text = selectedCategory?.name
         } else {
-            navigationController?.title = "Add Item"            
+            navigationController?.title = "Add Item"
+            categoryLabel.text = "No Category Selected"
         }
         super.viewDidLoad()
 
@@ -59,10 +61,14 @@ class ItemDetailViewController: UITableViewController {
             itemToEdit!.name = itemName.text!
             itemToEdit!.description = itemDescription.text!
             itemToEdit!.modificationTime = Date()
-            itemToEdit!.category = selectedCategory!
-            delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!)
+//            itemToEdit!.category = selectedCategory!
+            if selectedCategory !== itemToEditCategory {
+                delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!, fromCategory: itemToEditCategory!, toCategory: selectedCategory!)
+            } else {
+                delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!)
+            }
         } else {
-            delegate!.listDetailViewController(self, didFinishAddingItem: Item(name: itemName.text!, description: itemDescription.text!, category: selectedCategory!))
+            delegate!.listDetailViewController(self, didFinishAddingItem: Item(name: itemName.text!, description: itemDescription.text!), forCategory: selectedCategory!)
         }
     }
     
@@ -86,8 +92,9 @@ class ItemDetailViewController: UITableViewController {
 
 protocol ItemDetailViewControllerDelegate {
     func listDetailViewControllerDidCancel(_ controller: ItemDetailViewController)
-    func listDetailViewController(_ controller: ItemDetailViewController, didFinishAddingItem item: Item)
+    func listDetailViewController(_ controller: ItemDetailViewController, didFinishAddingItem item: Item, forCategory category: Category)
     func listDetailViewController(_ controller: ItemDetailViewController, didFinishEditingItem item: Item)
+    func listDetailViewController(_ controller: ItemDetailViewController, didFinishEditingItem item: Item, fromCategory oldCategory: Category, toCategory newCategory: Category)
 }
 
 extension ItemDetailViewController:UITextFieldDelegate {
@@ -97,7 +104,19 @@ extension ItemDetailViewController:UITextFieldDelegate {
         
         let nsString = textField.text as NSString?
         let newString = nsString?.replacingCharacters(in: range, with: string)
-        doneButton!.isEnabled = !newString!.isEmpty
+        
+        if textField == itemName {
+            if itemToEdit != nil {
+                doneButton!.isEnabled = (!newString!.isEmpty && newString! != itemToEdit!.name) || (itemDescription.text! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+            } else {
+                doneButton!.isEnabled = !newString!.isEmpty && selectedCategory != nil
+            }
+        } else if textField == itemDescription {
+            if itemToEdit != nil {
+                doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.name) || (newString! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+            }
+        }
+        
         return true
     }
     
@@ -110,6 +129,11 @@ extension ItemDetailViewController:CategoryPickerControllerDelegate {
     func categoryPickerViewController(_ controller: CategoryPickerController, didFinishPickingCategory category: Category) {
         selectedCategory = category
         categoryLabel.text = selectedCategory!.name
+        if itemToEdit != nil {
+            doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.name) || (itemDescription.text! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+        } else {
+            self.doneButton!.isEnabled = !itemName.text!.isEmpty && selectedCategory != nil
+        }
         tableView.reloadRows(at: [NSIndexPath(row: 0, section: 1) as IndexPath], with: .none)
         controller.dismiss(animated: false, completion: nil)
     }

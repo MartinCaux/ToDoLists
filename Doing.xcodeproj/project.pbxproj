@@ -36,7 +36,7 @@
 		08B97166221FEFE000828EE8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		08B9716C222027BA00828EE8 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		08B9716E22202DBE00828EE8 /* ItemDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailViewController.swift; sourceTree = "<group>"; };
-		08B9717422203DD900828EE8 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		08B9717422203DD900828EE8 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		08B971762220533800828EE8 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		4A3A1E7E13BE2854B46BC9B7 /* Pods-Doing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Doing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Doing/Pods-Doing.release.xcconfig"; sourceTree = "<group>"; };
 		A25E6C549D45A5DE5F5C24C5 /* Pods-Doing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Doing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Doing/Pods-Doing.debug.xcconfig"; sourceTree = "<group>"; };

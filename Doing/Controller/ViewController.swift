@@ -11,21 +11,42 @@ import UIKit
 class ViewController: UIViewController {
 
     let dataModel = DataModel.sharedInstance
-
-    @IBOutlet weak var tableView: UITableView!
-
     var okAction: UIAlertAction?
+
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchButton: UIBarButtonItem!
+    @IBOutlet weak var searchBarHeightConstraint: NSLayoutConstraint!
+    @IBOutlet var noResultCell: UITableViewCell!
+    
+    
+    
 
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         dataModel.loadCategorylist()
-        dataModel.loadChecklists()
+//        dataModel.loadChecklists()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+//        searchBar = UISearchBar()
+        searchBar.sizeToFit()
+        searchBarHeightConstraint.constant = 0
+        searchBar.isHidden = true
+        searchBar.delegate = self
+        
         // Do any additional setup after loading the view, typically from a nib.
+    }
+
+    @IBAction func search(_ sender: Any) {
+        navigationController?.isNavigationBarHidden = true
+        searchBar.isHidden = false
+        searchBarHeightConstraint.constant = 44
+        searchBar.showsCancelButton = true
+        searchBar.becomeFirstResponder()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -38,7 +59,8 @@ class ViewController: UIViewController {
             let destVC = navVC.topViewController as! ItemDetailViewController
             destVC.delegate = self
             let indexOfSelectedCell = tableView.indexPath(for: (sender as! UITableViewCell))
-            destVC.itemToEdit = dataModel.filteredItemList[indexOfSelectedCell!.row]
+            destVC.itemToEdit = dataModel.selectedCategoryList[indexOfSelectedCell!.section].items[indexOfSelectedCell!.row]
+            destVC.itemToEditCategory = dataModel.selectedCategoryList[indexOfSelectedCell!.section]
         } else if (segue.identifier == "selectCategory") {
             let navVC = segue.destination as! UINavigationController
             let destVC = navVC.topViewController as! CategoriesViewController
@@ -48,39 +70,54 @@ class ViewController: UIViewController {
 }
 
 extension ViewController:UITableViewDelegate, UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return dataModel.selectedCategoryList.count > 0 ? dataModel.selectedCategoryList.count : 1
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return dataModel.selectedCategoryList.count > 0 ? dataModel.selectedCategoryList[section].name : ""
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataModel.filteredItemList.count
+        return dataModel.selectedCategoryList.count > 0 ? dataModel.selectedCategoryList[section].filteredItems.count : 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier")!
-        cell.textLabel?.text = dataModel.filteredItemList[indexPath.row].name
-        cell.accessoryType = dataModel.filteredItemList[indexPath.row].checked ? .checkmark : .none
-        return cell
+        if dataModel.selectedCategoryList.count > 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier")!
+            cell.textLabel?.text = dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].name
+            cell.accessoryType = dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].checked ? .checkmark : .none
+            return cell
+        } else {
+            return noResultCell
+        }
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        dataModel.filteredItemList[indexPath.row].toggleChecked()
-        tableView.deselectRow(at: indexPath, animated: false)
-        tableView.reloadRows(at: [indexPath], with: UITableView.RowAnimation.none)
+        if dataModel.selectedCategoryList.count > 0 {
+            dataModel.selectedCategoryList[indexPath.section].filteredItems[indexPath.row].toggleChecked()
+            tableView.deselectRow(at: indexPath, animated: false)
+            tableView.reloadRows(at: [indexPath], with: UITableView.RowAnimation.none)
+        } else {
+            tableView.deselectRow(at: indexPath, animated: false)
+        }
     }
 
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
-            let itemToDelete = self.dataModel.filteredItemList[indexPath.row]
-            let indexOfItemToDelete = self.dataModel.itemList.index(where: { (item) -> Bool in
-                item.name == itemToDelete.name && item.category.name == itemToDelete.category.name
-            })
-            self.dataModel.itemList.remove(at: indexOfItemToDelete!)
-            self.dataModel.filteredItemList.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
-            self.dataModel.sortCheckLists()
+        if dataModel.selectedCategoryList.count > 0 {
+            let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
+                self.dataModel.selectedCategoryList[indexPath.section].filteredItems.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
+                self.dataModel.sortCheckLists()
+            }
+            let favorite = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+                self.performSegue(withIdentifier: "editItem", sender: tableView.cellForRow(at: indexPath))
+            }
+            favorite.backgroundColor = .orange
+            return [delete, favorite]
+        } else {
+            return []
         }
-        let favorite = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
-            self.performSegue(withIdentifier: "editItem", sender: tableView.cellForRow(at: indexPath))
-        }
-        favorite.backgroundColor = .orange
-        return [delete, favorite]
     }
 
 
@@ -88,13 +125,16 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
 
 
 extension ViewController:ItemDetailViewControllerDelegate {
+    
     func listDetailViewControllerDidCancel(_ controller: ItemDetailViewController) {
         controller.dismiss(animated: true)
     }
 
-    func listDetailViewController(_ controller: ItemDetailViewController, didFinishAddingItem item: Item) {
+    func listDetailViewController(_ controller: ItemDetailViewController, didFinishAddingItem item: Item, forCategory category: Category) {
         controller.dismiss(animated: true)
-        dataModel.itemList.append(item)
+        category.filteredItems.append(item)
+        category.items.append(item)
+//        dataModel.itemList.append(item)
         dataModel.sortCheckLists()
 //        let indexOfNewItem = dataModel.itemList.index(where: {$0 === item})
         //        self.tableView.insertRows(at: [NSIndexPath(row: indexOfNewItem!, section: 0) as IndexPath], with: UITableView.RowAnimation.automatic)
@@ -104,13 +144,24 @@ extension ViewController:ItemDetailViewControllerDelegate {
 
     func listDetailViewController(_ controller: ItemDetailViewController, didFinishEditingItem item: Item) {
         controller.dismiss(animated: true)
-//        let indexOfPreviousItem = dataModel.itemList.index(where: {$0 === item})
+        
         dataModel.sortCheckLists()
-//        let indexOfEditedItem = dataModel.itemList.index(where: {$0 === item})
-//        dataModel.itemList.remove(at: indexOfPreviousItem!)
-//        self.tableView.deleteRows(at: [NSIndexPath(row: indexOfPreviousItem!, section: 0) as IndexPath], with: UITableView.RowAnimation.fade)
-//        dataModel.itemList.insert(item, at: indexOfEditedItem!)
-//        self.tableView.insertRows(at: [NSIndexPath(row: indexOfEditedItem!, section: 0) as IndexPath], with: UITableView.RowAnimation.automatic)
+        dataModel.filter()
+        tableView.reloadData()
+    }
+    
+    func listDetailViewController(_ controller: ItemDetailViewController, didFinishEditingItem item: Item, fromCategory oldCategory: Category, toCategory newCategory: Category) {
+        controller.dismiss(animated: true)
+        
+        var indexOfItemToRemove = oldCategory.filteredItems.index(where: {$0 === item})
+        oldCategory.filteredItems.remove(at: indexOfItemToRemove!)
+        
+        indexOfItemToRemove = oldCategory.items.index(where: {$0 === item})
+        oldCategory.items.remove(at: indexOfItemToRemove!)
+        
+        newCategory.items.append(item)
+        newCategory.filteredItems.append(item)
+        dataModel.sortCheckLists()
         dataModel.filter()
         tableView.reloadData()
     }
@@ -123,5 +174,27 @@ extension ViewController:CategoriesViewControllerDelegate {
         tableView.reloadData()
     }
     
+    
+}
+
+extension ViewController:UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        dataModel.initAllFilteredItemList()
+        dataModel.filter()
+        navigationController?.isNavigationBarHidden = false
+        searchBar.resignFirstResponder()
+        searchBar.text = ""
+        searchBar.isHidden = true
+        searchBar.showsCancelButton = false
+        searchBarHeightConstraint.constant = 0
+        tableView.reloadData()
+    }
+    
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        dataModel.filterItems(filter: searchText)
+        tableView.reloadData()
+    }
     
 }
