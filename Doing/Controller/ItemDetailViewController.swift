@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import CoreData
 
 class ItemDetailViewController: UITableViewController {
 
+    let dataModel = DataModel.sharedInstance
     @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet weak var itemName: UITextField!
     @IBOutlet weak var itemDescription: UITextField!
@@ -38,16 +40,19 @@ class ItemDetailViewController: UITableViewController {
         doneButton.isEnabled = false
         if(itemToEdit != nil) {
             navigationController?.title = "Edit Item"
-            itemName.text = itemToEdit!.name
-            itemDescription.text = itemToEdit!.description
+            itemName.text = itemToEdit!.itemName
+            itemDescription.text = itemToEdit!.itemDescription
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM dd, yyyy 'at' hh:mm a"
-            itemCreationTime.text = dateFormatter.string(from: itemToEdit!.creationTime)
+            itemCreationTime.text = dateFormatter.string(from: itemToEdit!.creationTime!)
             if(itemToEdit!.modificationTime != nil) {
                 itemModificationTime.text = dateFormatter.string(from: itemToEdit!.modificationTime!)
             }
             selectedCategory = itemToEditCategory!
-            categoryLabel.text = selectedCategory?.name
+            categoryLabel.text = selectedCategory?.categoryName
+            itemImage.image = UIImage(data: (itemToEdit?.image!)!)
+            itemImage.contentMode = .scaleToFill
+            noImageSelectedLabel.isHidden = true
         } else {
             navigationController?.title = "Add Item"
             categoryLabel.text = "No Category Selected"
@@ -70,17 +75,21 @@ class ItemDetailViewController: UITableViewController {
     
     @IBAction func done(_ sender: Any) {
         if(itemToEdit != nil) {
-            itemToEdit!.name = itemName.text!
-            itemToEdit!.description = itemDescription.text!
-            itemToEdit!.modificationTime = Date()
+            itemToEdit?.setValue(itemName.text, forKey: "itemName")
+            itemToEdit?.setValue(itemDescription.text, forKey: "itemDescription")
+            itemToEdit?.setValue(Date(), forKey: "modificationTime")
+            itemToEdit?.setValue(itemImage.image?.pngData(), forKey: "image")
 //            itemToEdit!.category = selectedCategory!
             if selectedCategory !== itemToEditCategory {
+                itemToEdit?.setValue(selectedCategory, forKey: "Category")
                 delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!, fromCategory: itemToEditCategory!, toCategory: selectedCategory!)
             } else {
                 delegate!.listDetailViewController(self, didFinishEditingItem: itemToEdit!)
             }
+            dataModel.save()
         } else {
-            delegate!.listDetailViewController(self, didFinishAddingItem: Item(name: itemName.text!, description: itemDescription.text!), forCategory: selectedCategory!)
+            let item = dataModel.insertItem(itemName: itemName.text!, itemDescription: itemDescription.text!, image: itemImage.image!, category: selectedCategory!)
+            delegate!.listDetailViewController(self, didFinishAddingItem: item, forCategory: selectedCategory!)
         }
     }
     
@@ -132,13 +141,13 @@ extension ItemDetailViewController:UITextFieldDelegate {
         
         if textField == itemName {
             if itemToEdit != nil {
-                doneButton!.isEnabled = (!newString!.isEmpty && newString! != itemToEdit!.name) || (itemDescription.text! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+                doneButton!.isEnabled = (!newString!.isEmpty && newString! != itemToEdit!.itemName) || (itemDescription.text! != itemToEdit!.itemDescription) || (selectedCategory?.categoryName != itemToEdit!.category?.categoryName) || (itemImage.image?.pngData() != itemToEdit?.image)
             } else {
-                doneButton!.isEnabled = !newString!.isEmpty && selectedCategory != nil
+                doneButton!.isEnabled = !newString!.isEmpty && selectedCategory != nil && itemImage.image != nil
             }
         } else if textField == itemDescription {
             if itemToEdit != nil {
-                doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.name) || (newString! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+                doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.itemName) || (newString! != itemToEdit!.itemDescription) || (selectedCategory?.categoryName != itemToEdit!.category?.categoryName) || (itemImage.image?.pngData() != itemToEdit?.image)
             }
         }
         
@@ -153,11 +162,11 @@ extension ItemDetailViewController:UITextFieldDelegate {
 extension ItemDetailViewController:CategoryPickerControllerDelegate {
     func categoryPickerViewController(_ controller: CategoryPickerController, didFinishPickingCategory category: Category) {
         selectedCategory = category
-        categoryLabel.text = selectedCategory!.name
+        categoryLabel.text = selectedCategory!.categoryName
         if itemToEdit != nil {
-            doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.name) || (itemDescription.text! != itemToEdit!.description) || selectedCategory !== itemToEditCategory
+            doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.itemName) || (itemDescription.text! != itemToEdit!.itemDescription) || (selectedCategory?.categoryName != itemToEdit!.category?.categoryName) || (itemImage.image?.pngData() != itemToEdit?.image)
         } else {
-            self.doneButton!.isEnabled = !itemName.text!.isEmpty && selectedCategory != nil
+            self.doneButton!.isEnabled = !itemName.text!.isEmpty && selectedCategory != nil && itemImage.image != nil
         }
         tableView.reloadRows(at: [NSIndexPath(row: 0, section: 1) as IndexPath], with: .none)
         controller.dismiss(animated: false, completion: nil)
@@ -170,6 +179,11 @@ extension ItemDetailViewController:UIImagePickerControllerDelegate, UINavigation
             itemImage.contentMode = .scaleToFill
             noImageSelectedLabel.isHidden = true
             itemImage.image = image
+            if itemToEdit != nil {
+                doneButton!.isEnabled = (!itemName.text!.isEmpty && itemName.text! != itemToEdit!.itemName) || (itemDescription.text! != itemToEdit!.itemDescription) || (selectedCategory?.categoryName != itemToEdit!.category?.categoryName) || (itemImage.image?.pngData() != itemToEdit?.image)
+            } else {
+                self.doneButton!.isEnabled = !itemName.text!.isEmpty && selectedCategory != nil && itemImage.image != nil
+            }
         }
         picker.dismiss(animated: true, completion: nil)
     }

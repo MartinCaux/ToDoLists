@@ -11,7 +11,7 @@ import UIKit
 class CategoriesViewController: UITableViewController {
 
     let dataModel = DataModel.sharedInstance
-    var tempCategoryList = DataModel.sharedInstance.categoryList.map{($0.copy() as! Category)}
+    var tempCategoryList = DataModel.sharedInstance.categoryList
     @IBOutlet weak var allCategoriesCell: UITableViewCell!
     @IBOutlet weak var addCategoryCell: UITableViewCell!
     
@@ -35,7 +35,6 @@ class CategoriesViewController: UITableViewController {
     }
     
     @IBAction func done(_ sender: Any) {
-        dataModel.categoryList = tempCategoryList
         delegate?.categoriesViewControllerDidFinishFiltering(controller: self)
     }
     
@@ -52,7 +51,7 @@ class CategoriesViewController: UITableViewController {
             
             (action) in
             if (alertDialog.textFields?[0].text != "") {
-                let category = Category(name: alertDialog.textFields![0].text!)
+                let category = self.dataModel.insertCategory(categoryName: alertDialog.textFields![0].text!)
                 self.tempCategoryList.append(category)
                 self.tableView.insertRows(at: [NSIndexPath(row: self.tempCategoryList.count - 1, section: 1) as IndexPath], with: .none)
             }
@@ -72,7 +71,7 @@ class CategoriesViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "ReuseIdentifierCustomCell", for: indexPath)
-            cell.textLabel?.text = tempCategoryList[indexPath.row].name
+            cell.textLabel?.text = tempCategoryList[indexPath.row].categoryName
             cell.accessoryType = tempCategoryList[indexPath.row].selected ? .checkmark : .none
             return cell
         } else if indexPath.section == 0 {
@@ -120,6 +119,7 @@ class CategoriesViewController: UITableViewController {
             tableView.deselectRow(at: indexPath, animated: false)
         } else if indexPath.section == 1 {
             toggleSelected(position: indexPath.row)
+            dataModel.save()
             tableView.reloadRows(at: [indexPath], with: .none)
         }
     }
@@ -145,7 +145,7 @@ class CategoriesViewController: UITableViewController {
     
     func deleteRow(indexPath: IndexPath) {
         let categoryToDelete = tempCategoryList[indexPath.row]
-        if categoryToDelete.items.count == 0 {
+        if categoryToDelete.items?.array.count == 0 {
             self.tempCategoryList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .none)
             if self.toggleAll() {
@@ -154,12 +154,12 @@ class CategoriesViewController: UITableViewController {
         } else {
             var message = "This category is used in : \n"
             var counter = 0
-            for item: Item in categoryToDelete.items {
+            for item: Item in categoryToDelete.items?.array as! [Item] {
                 counter += 1
-                if counter < 3 && counter < categoryToDelete.items.count {
-                    message += "\(item.name), "
-                } else if counter == 3 || counter == categoryToDelete.items.count {
-                    message += "\(item.name)"
+                if counter < 3 && counter < (categoryToDelete.items?.array.count)! {
+                    message += "\(String(describing: item.itemName)), "
+                } else if counter == 3 || counter == categoryToDelete.items!.count {
+                    message += "\(String(describing: item.itemName))"
                     break
                 }
             }

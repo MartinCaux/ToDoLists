@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08B68194225F1A7F00188FA8 /* Doing.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 08B68192225F1A7F00188FA8 /* Doing.xcdatamodeld */; };
+		08B68196225F1FE800188FA8 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B68195225F1FE800188FA8 /* CoreDataManager.swift */; };
 		08B68CB9223F9A0600F61EC4 /* CategoryPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B68CB8223F9A0600F61EC4 /* CategoryPickerController.swift */; };
 		08B68CBD223FB21800F61EC4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08B68CBC223FB21800F61EC4 /* GoogleService-Info.plist */; };
 		08B68CBF223FB56B00F61EC4 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B68CBE223FB56B00F61EC4 /* CategoriesViewController.swift */; };
@@ -24,6 +26,8 @@
 
 /* Begin PBXFileReference section */
 		05E5C62539B5B55FC44BAD81 /* Pods_Doing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Doing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		08B68193225F1A7F00188FA8 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		08B68195225F1FE800188FA8 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		08B68CB8223F9A0600F61EC4 /* CategoryPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPickerController.swift; sourceTree = "<group>"; };
 		08B68CBC223FB21800F61EC4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		08B68CBE223FB56B00F61EC4 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +61,7 @@
 		08B9714E221FEFDF00828EE8 = {
 			isa = PBXGroup;
 			children = (
+				08B68192225F1A7F00188FA8 /* Doing.xcdatamodeld */,
 				08B97159221FEFDF00828EE8 /* Doing */,
 				08B97158221FEFDF00828EE8 /* Products */,
 				38BB4B5DB7F07431E423D9D5 /* Pods */,
@@ -103,6 +108,7 @@
 				08B9716C222027BA00828EE8 /* Item.swift */,
 				08B9717422203DD900828EE8 /* DataModel.swift */,
 				08B971762220533800828EE8 /* Category.swift */,
+				08B68195225F1FE800188FA8 /* CoreDataManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -265,8 +271,10 @@
 				08B9716D222027BA00828EE8 /* Item.swift in Sources */,
 				08B9716F22202DBE00828EE8 /* ItemDetailViewController.swift in Sources */,
 				08B68CB9223F9A0600F61EC4 /* CategoryPickerController.swift in Sources */,
+				08B68194225F1A7F00188FA8 /* Doing.xcdatamodeld in Sources */,
 				08B9715B221FEFDF00828EE8 /* AppDelegate.swift in Sources */,
 				08B68CBF223FB56B00F61EC4 /* CategoriesViewController.swift in Sources */,
+				08B68196225F1FE800188FA8 /* CoreDataManager.swift in Sources */,
 				08B971772220533800828EE8 /* Category.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -467,6 +475,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		08B68192225F1A7F00188FA8 /* Doing.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				08B68193225F1A7F00188FA8 /* Model.xcdatamodel */,
+			);
+			currentVersion = 08B68193225F1A7F00188FA8 /* Model.xcdatamodel */;
+			path = Doing.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 08B9714F221FEFDF00828EE8 /* Project object */;
 }
