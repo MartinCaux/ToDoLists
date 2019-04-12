@@ -34,7 +34,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        dataModel.delegate = self
         
         
 //        searchBar = UISearchBar()
@@ -45,6 +45,16 @@ class ViewController: UIViewController {
         
         // Do any additional setup after loading the view, typically from a nib.
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        var index = 0
+        for category: Category in dataModel.selectedCategoryList {
+            dataModel.getFilteredItemsForCategory(category: category, section: index)
+            index += 1
+        }
+        tableView.reloadData()
+    }
+    
 
     @IBAction func search(_ sender: Any) {
         navigationController?.isNavigationBarHidden = true
@@ -64,7 +74,7 @@ class ViewController: UIViewController {
             let destVC = navVC.topViewController as! ItemDetailViewController
             destVC.delegate = self
             let indexOfSelectedCell = tableView.indexPath(for: (sender as! UITableViewCell))
-            let itemList = dataModel.getFilteredItemsForCategory(category: dataModel.selectedCategoryList[indexOfSelectedCell!.section])
+            let itemList = dataModel.currentSectionItemList[indexOfSelectedCell!.section]
             destVC.itemToEdit = itemList[indexOfSelectedCell!.row]
             destVC.itemToEditCategory = dataModel.selectedCategoryList[indexOfSelectedCell!.section]
         } else if (segue.identifier == "selectCategory") {
@@ -85,14 +95,17 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let itemList = dataModel.getFilteredItemsForCategory(category: dataModel.selectedCategoryList[section])
+        var itemList = [Item]()
+        if dataModel.selectedCategoryList.count > 0 && dataModel.currentSectionItemList.count > 0 {
+            itemList = dataModel.currentSectionItemList[section]
+        }
         return dataModel.selectedCategoryList.count > 0 ? itemList.count : 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if dataModel.selectedCategoryList.count > 0 {
+        if dataModel.selectedCategoryList.count > 0 && dataModel.currentSectionItemList.count > 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier")!
-            let itemList = dataModel.getFilteredItemsForCategory(category: dataModel.selectedCategoryList[indexPath.section])
+            let itemList = dataModel.currentSectionItemList[indexPath.section]
             cell.textLabel?.text = itemList[indexPath.row].itemName
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM dd, yyyy 'at' hh:mm a"
@@ -106,8 +119,8 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if dataModel.selectedCategoryList.count > 0 {
-            let itemList = dataModel.getFilteredItemsForCategory(category: dataModel.selectedCategoryList[indexPath.section])
+        if dataModel.selectedCategoryList.count > 0 && dataModel.currentSectionItemList.count > 0 {
+            let itemList = dataModel.currentSectionItemList[indexPath.section]
             itemList[indexPath.row].toggleChecked()
             tableView.deselectRow(at: indexPath, animated: false)
             tableView.reloadRows(at: [indexPath], with: UITableView.RowAnimation.none)
@@ -117,9 +130,9 @@ extension ViewController:UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        if dataModel.selectedCategoryList.count > 0 {
+        if dataModel.selectedCategoryList.count > 0 && dataModel.currentSectionItemList.count > 0 {
             let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
-                let itemList = self.dataModel.getFilteredItemsForCategory(category: self.dataModel.selectedCategoryList[indexPath.section])
+                let itemList = self.dataModel.currentSectionItemList[indexPath.section]
                 self.dataModel.deleteItem(item: itemList[indexPath.row])
                 tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
                 //self.dataModel.sortCheckLists()
@@ -199,5 +212,13 @@ extension ViewController:UISearchBarDelegate {
         dataModel.filterItems(filter: searchText)
         tableView.reloadData()
     }
+    
+}
+
+extension ViewController:DataModelDelegate {
+    func updateData() {
+        tableView.reloadData()
+    }
+    
     
 }
