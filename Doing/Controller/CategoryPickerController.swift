@@ -33,6 +33,7 @@ class CategoryPickerController: UITableViewController {
             if (alertDialog.textFields?[0].text != "") {
                 let category = self.dataModel.insertCategory(categoryName: alertDialog.textFields![0].text!)
                 self.dataModel.categoryList.append(category)
+                self.dataModel.selectedCategoryList.append(category)
                 self.tableView.insertRows(at: [NSIndexPath(row: self.dataModel.categoryList.count - 1, section: 0) as IndexPath], with: .none)
             }
         }
